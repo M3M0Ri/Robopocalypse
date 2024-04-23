@@ -2,6 +2,7 @@ import pygame, sys
 from player import Player
 from laser import Laser
 import obstacle
+from human import Human
 
 
 class Game:
@@ -18,6 +19,13 @@ class Game:
         self.obstacle_x_positions = [(num * (screen_width / self.obstacle_amount)) for num in range(self.obstacle_amount)]
         self.create_multiple_obstacle(*self.obstacle_x_positions, x_start=screen_width/15, y_start=480)
 
+
+
+        #human
+        self.humans = pygame.sprite.Group()
+        self.human_setup(rows=6, cols=8)
+
+
     def create_obstacle(self, x_start, y_start, offset_x):
         for row_index, row in enumerate(self.shape):
             for col_index, col in enumerate(row):
@@ -30,6 +38,21 @@ class Game:
     def create_multiple_obstacle(self, *offset, x_start, y_start):
         for offset_x in offset:
             self.create_obstacle(x_start, y_start, offset_x)
+
+    def human_setup(self, rows, cols, x_distance=65, y_distance=50,
+                    x_offset=70, y_offset=100):
+        for row_index, row in enumerate(range(rows)):
+            for col_index, col in enumerate(range(cols)):
+                x = col_index * x_distance + x_offset
+                y = row_index * y_distance + y_offset
+
+                if row_index == 0: human_sprite = Human("bald (1)", x, y)
+                elif 1<= row_index <= 2: human_sprite = Human("2 (3)", x, y)
+                else: human_sprite = Human("1 (2)", x, y)
+                self.humans.add(human_sprite)
+
+
+
     def run(self):
         while True:
             for event in pygame.event.get():
@@ -42,6 +65,7 @@ class Game:
             self.player.sprite.lasers.draw(screen)
             self.player.draw(screen)
             self.blocks.draw(screen)
+            self.humans.draw(screen)
 
             pygame.display.flip()
             clock.tick(60)
