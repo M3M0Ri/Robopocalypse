@@ -1,5 +1,6 @@
 import pygame, sys
 from player import Player
+from laser import Laser
 
 
 class Game:
@@ -16,6 +17,7 @@ class Game:
 
             screen.fill((30, 30, 30))
             self.player.update()
+            self.player.sprite.lasers.draw(screen)
             self.player.draw(screen)
 
             pygame.display.flip()
