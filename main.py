@@ -75,7 +75,7 @@ class Game:
     def human_shoot(self):
         if self.humans.sprites():
             random_human = choice(self.humans.sprites())
-            laser_sprite = Laser(random_human.rect.center, speed=1
+            laser_sprite = Laser(random_human.rect.center, speed=0.8
                                  , screen_height=screen_height)
             self.human_lasers.add(laser_sprite)
 
@@ -86,6 +86,41 @@ class Game:
             self.extra.add(Extra(choice(["right", "left"]), screen_width))
             self.extra_spawn_time = randint(400, 800)
 
+    def collision_checks(self):
+        #player laser
+        if self.player.sprite.lasers:
+            for laser in self.player.sprite.lasers:
+                #obstical collisions
+                if pygame.sprite.spritecollide(laser, self.blocks, True):
+                    laser.kill()
+
+                # human collisions
+                if pygame.sprite.spritecollide(laser, self.humans, True):
+                    laser.kill()
+
+                # extra collisions
+                if pygame.sprite.spritecollide(laser, self.extra, True):
+                    laser.kill()
+
+        #human laser
+        if self.human_lasers:
+            for laser in self.human_lasers:
+                # obstical collisions
+                if pygame.sprite.spritecollide(laser, self.blocks, True):
+                    laser.kill()
+
+                    # human collisions
+                if pygame.sprite.spritecollide(laser, self.player, False):
+                    laser.kill()
+
+        #humans
+        if self.humans:
+            for human in self.humans:
+                pygame.sprite.spritecollide(human, self.blocks, True)
+
+                if pygame.sprite.spritecollide(human, self.player, False):
+                    pygame.quit()
+                    sys.exit()
 
     def run(self):
         HUMANLASER = pygame.USEREVENT + 1
@@ -108,6 +143,8 @@ class Game:
             self.human_lasers.update()
             self.extra_human_timer()
             self.extra.update()
+            self.collision_checks()
+
             self.player.sprite.lasers.draw(screen)
             self.player.draw(screen)
             self.blocks.draw(screen)
