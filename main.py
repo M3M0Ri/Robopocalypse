@@ -2,8 +2,9 @@ import pygame, sys
 from player import Player
 from laser import Laser
 import obstacle
-from human import Human
-from random import choice
+from human import Human, Extra
+from random import choice, randint
+
 
 class Game:
     def __init__(self):
@@ -27,6 +28,9 @@ class Game:
         self.human_setup(rows=5, cols=5)
         self.human_direction = 1
 
+        #extra
+        self.extra = pygame.sprite.GroupSingle()
+        self.extra_spawn_time = randint(40, 80)
 
     def create_obstacle(self, x_start, y_start, offset_x):
         for row_index, row in enumerate(self.shape):
@@ -58,10 +62,10 @@ class Game:
         for human in all_human:
             if human.rect.right >= screen_width:
                 self.human_direction = -1
-                self.human_move_down(0.5)
+                self.human_move_down(0.4)
             elif human.rect.left <= 0:
                 self.human_direction = 1
-                self.human_move_down(0.5)
+                self.human_move_down(0.4)
 
     def human_move_down(self, distnace):
         if self.humans:
@@ -71,32 +75,45 @@ class Game:
     def human_shoot(self):
         if self.humans.sprites():
             random_human = choice(self.humans.sprites())
-            laser_sprite = Laser(random_human.rect.center, speed=3
+            laser_sprite = Laser(random_human.rect.center, speed=1
                                  , screen_height=screen_height)
             self.human_lasers.add(laser_sprite)
 
 
+    def extra_human_timer(self):
+        self.extra_spawn_time -= 1
+        if self.extra_spawn_time <= 0:
+            self.extra.add(Extra(choice(["right", "left"]), screen_width))
+            self.extra_spawn_time = randint(400, 800)
 
 
     def run(self):
+        HUMANLASER = pygame.USEREVENT + 1
+        pygame.time.set_timer(HUMANLASER, 800)
+
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                if event.type == HUMANLASER:
+                    game.human_shoot()
+
 
             screen.fill((30, 30, 30))
             self.player.update()
             self.humans.update(self.human_direction)
             self.human_position_checker()
-            self.human_shoot()
+            #self.human_shoot()
             self.human_lasers.update()
+            self.extra_human_timer()
+            self.extra.update()
             self.player.sprite.lasers.draw(screen)
             self.player.draw(screen)
             self.blocks.draw(screen)
             self.humans.draw(screen)
             self.human_lasers.draw(screen)
-
+            self.extra.draw(screen)
 
             pygame.display.flip()
             clock.tick(60)
@@ -111,3 +128,4 @@ if __name__ == "__main__":
 
     game = Game()
     game.run()
+
