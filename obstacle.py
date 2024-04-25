@@ -8,7 +8,10 @@ class Block(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect(topleft = (x,y))
 
 shape = [
-'xxxxxxxxxxxxx',
-'  xxxxxxxxx  ',
-'  xxxxxxxxx  ',
-]
+'  xxxxxxx',
+' xxxxxxxxx',
+'xxxxxxxxxxx',
+'xxxxxxxxxxx',
+'xxxxxxxxxxx',
+'xxx     xxx',
+'xx       xx']
