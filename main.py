@@ -20,7 +20,7 @@ class Game:
         self.font = pygame.font.Font('font/Pixeled.ttf', 20)
 
         #obstacle
-        self.shape  = obstacle.shape
+        self.shape = obstacle.shape
         self.block_size = 5
         self.blocks = pygame.sprite.Group()
         self.obstacle_amount = 3
@@ -54,7 +54,7 @@ class Game:
                 if col == "x":
                     x = x_start + col_index * self.block_size + offset_x
                     y = y_start + row_index * self.block_size
-                    block = obstacle.Block(self.block_size, (93, 63, 211), x, y)
+                    block = obstacle.Block(self.block_size, (255, 255, 255), x, y)
                     self.blocks.add(block)
 
     def create_multiple_obstacle(self, *offset, x_start, y_start):
@@ -178,7 +178,11 @@ class Game:
                     game.human_shoot()
 
 
-            screen.fill((30, 30, 30))
+           #screen.fill((0, 0, 0))
+            bg_image = pygame.image.load("background/bg4.jpg")
+            screen.blit(bg_image, (0, 0))
+
+
             self.player.update()
             self.humans.update(self.human_direction)
             self.human_position_checker()
@@ -226,6 +230,7 @@ if __name__ == "__main__":
     screen_height = 720
     screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
+    pygame.display.set_caption("Robopocalypse")
 
     game = Game()
     crt = CRT()
