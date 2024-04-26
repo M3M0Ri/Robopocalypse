@@ -12,6 +12,12 @@ class Game:
         player_spirit = Player((screen_width / 2, screen_height), screen_width, 5)
         self.player = pygame.sprite.GroupSingle(player_spirit)
 
+        #health and score setup
+        self.lives = 3
+        self.live_surf = pygame.image.load("graphics/arcos3.png").convert_alpha()
+        self.live_x_start_pos = screen_width - (self.live_surf.get_size()[0] * 2 + 20)
+
+
         #obstacle
         self.shape  = obstacle.shape
         self.block_size = 5
@@ -109,9 +115,13 @@ class Game:
                 if pygame.sprite.spritecollide(laser, self.blocks, True):
                     laser.kill()
 
-                    # human collisions
+
                 if pygame.sprite.spritecollide(laser, self.player, False):
                     laser.kill()
+                    self.lives -= 1
+                    if self.lives <= 0:
+                        pygame.quit()
+                        sys.exit()
 
         #humans
         if self.humans:
@@ -121,6 +131,13 @@ class Game:
                 if pygame.sprite.spritecollide(human, self.player, False):
                     pygame.quit()
                     sys.exit()
+
+
+    def display_lives(self):
+        for live in range(self.lives - 1):
+            x = self.live_x_start_pos + (live * (self.live_surf.get_size()[0] + 10))
+            screen.blit(self.live_surf, (x, 8))
+
 
     def run(self):
         HUMANLASER = pygame.USEREVENT + 1
@@ -144,7 +161,7 @@ class Game:
             self.extra_human_timer()
             self.extra.update()
             self.collision_checks()
-
+            self.display_lives()
             self.player.sprite.lasers.draw(screen)
             self.player.draw(screen)
             self.blocks.draw(screen)
