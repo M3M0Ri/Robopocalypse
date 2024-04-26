@@ -9,7 +9,7 @@ from random import choice, randint
 class Game:
     def __init__(self):
         #arcos
-        player_spirit = Player((screen_width / 2, screen_height), screen_width, 5)
+        player_spirit = Player((screen_width / 2, screen_height), screen_width, 6)
         self.player = pygame.sprite.GroupSingle(player_spirit)
 
         #health and score setup
@@ -78,10 +78,10 @@ class Game:
         for human in all_human:
             if human.rect.right >= screen_width:
                 self.human_direction = -1
-                self.human_move_down(0.4)
+                self.human_move_down(0.8)
             elif human.rect.left <= 0:
                 self.human_direction = 1
-                self.human_move_down(0.4)
+                self.human_move_down(0.8)
 
     def human_move_down(self, distnace):
         if self.humans:
@@ -109,6 +109,7 @@ class Game:
                 #obstical collisions
                 if pygame.sprite.spritecollide(laser, self.blocks, True):
                     laser.kill()
+
 
                 # human collisions
                 humans_hit = pygame.sprite.spritecollide(laser, self.humans, True)
@@ -158,6 +159,11 @@ class Game:
         score_rect = score_surf.get_rect(topleft=(10, -10))
         screen.blit(score_surf, score_rect)
 
+    def victory_message(self):
+        if not self.humans.sprites():
+            victory_surf = self.font.render('YOU WON !!', False, 'green')
+            victory_rect = victory_surf.get_rect(center=(screen_width / 2, screen_height / 2))
+            screen.blit(victory_surf, victory_rect)
 
     def run(self):
         HUMANLASER = pygame.USEREVENT + 1
@@ -190,6 +196,7 @@ class Game:
             self.extra.draw(screen)
             self.display_lives()
             self.display_score()
+            self.victory_message()
 
             pygame.display.flip()
             clock.tick(60)
@@ -215,7 +222,7 @@ class CRT:
 
 if __name__ == "__main__":
     pygame.init()
-    screen_width = 1280
+    screen_width = 800
     screen_height = 720
     screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
