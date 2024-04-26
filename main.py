@@ -16,7 +16,8 @@ class Game:
         self.lives = 3
         self.live_surf = pygame.image.load("graphics/arcos3.png").convert_alpha()
         self.live_x_start_pos = screen_width - (self.live_surf.get_size()[0] * 2 + 20)
-
+        self.score = 0
+        self.font = pygame.font.Font('font/Pixeled.ttf', 20)
 
         #obstacle
         self.shape  = obstacle.shape
@@ -101,12 +102,17 @@ class Game:
                     laser.kill()
 
                 # human collisions
-                if pygame.sprite.spritecollide(laser, self.humans, True):
+                humans_hit = pygame.sprite.spritecollide(laser, self.humans, True)
+                if humans_hit:
+                    for human in humans_hit:
+                        self.score += human.value
                     laser.kill()
 
                 # extra collisions
                 if pygame.sprite.spritecollide(laser, self.extra, True):
+                    self.score += 500
                     laser.kill()
+
 
         #human laser
         if self.human_lasers:
@@ -138,6 +144,11 @@ class Game:
             x = self.live_x_start_pos + (live * (self.live_surf.get_size()[0] + 10))
             screen.blit(self.live_surf, (x, 8))
 
+    def display_score(self):
+        score_surf = self.font.render(f'score: {self.score}', False, 'white')
+        score_rect = score_surf.get_rect(topleft=(10, -10))
+        screen.blit(score_surf, score_rect)
+
 
     def run(self):
         HUMANLASER = pygame.USEREVENT + 1
@@ -161,13 +172,15 @@ class Game:
             self.extra_human_timer()
             self.extra.update()
             self.collision_checks()
-            self.display_lives()
+
             self.player.sprite.lasers.draw(screen)
             self.player.draw(screen)
             self.blocks.draw(screen)
             self.humans.draw(screen)
             self.human_lasers.draw(screen)
             self.extra.draw(screen)
+            self.display_lives()
+            self.display_score()
 
             pygame.display.flip()
             clock.tick(60)

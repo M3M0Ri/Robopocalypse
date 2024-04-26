@@ -8,6 +8,10 @@ class Human(pygame.sprite.Sprite):
         self.image = pygame.image.load(file_path).convert_alpha()
         self.rect = self.image.get_rect(topleft = (x, y))
 
+        if color == "1": self.value = 100
+        elif color == "2": self.value = 200
+        else: self.value = 300
+
     def update(self, direction):
         self.rect.x += direction
 
