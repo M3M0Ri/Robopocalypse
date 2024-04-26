@@ -13,9 +13,9 @@ class Game:
         self.player = pygame.sprite.GroupSingle(player_spirit)
 
         #health and score setup
-        self.lives = 3
+        self.lives = 4
         self.live_surf = pygame.image.load("graphics/arcos3.png").convert_alpha()
-        self.live_x_start_pos = screen_width - (self.live_surf.get_size()[0] * 2 + 20)
+        self.live_x_start_pos = screen_width - (self.live_surf.get_size()[0] * 2 + 70)
         self.score = 0
         self.font = pygame.font.Font('font/Pixeled.ttf', 20)
 
@@ -38,6 +38,15 @@ class Game:
         #extra
         self.extra = pygame.sprite.GroupSingle()
         self.extra_spawn_time = randint(40, 80)
+
+        #music
+        music = pygame.mixer.Sound("music/music.mp3")
+        music.set_volume(0.2)
+        music.play(loops= -1)
+        self.laser_sound = pygame.mixer.Sound("music/laser.mp3")
+        self.laser_sound.set_volume(0.5)
+        self.explosion_sound = pygame.mixer.Sound("music/explosion.wav")
+        self.explosion_sound.set_volume(0.3)
 
     def create_obstacle(self, x_start, y_start, offset_x):
         for row_index, row in enumerate(self.shape):
@@ -82,7 +91,7 @@ class Game:
     def human_shoot(self):
         if self.humans.sprites():
             random_human = choice(self.humans.sprites())
-            laser_sprite = Laser(random_human.rect.center, speed=0.8
+            laser_sprite = Laser(random_human.rect.center, speed=0.5
                                  , screen_height=screen_height)
             self.human_lasers.add(laser_sprite)
 
@@ -107,6 +116,7 @@ class Game:
                     for human in humans_hit:
                         self.score += human.value
                     laser.kill()
+                    self.explosion_sound.play()
 
                 # extra collisions
                 if pygame.sprite.spritecollide(laser, self.extra, True):
@@ -138,14 +148,13 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
-
     def display_lives(self):
         for live in range(self.lives - 1):
             x = self.live_x_start_pos + (live * (self.live_surf.get_size()[0] + 10))
             screen.blit(self.live_surf, (x, 8))
 
     def display_score(self):
-        score_surf = self.font.render(f'score: {self.score}', False, 'white')
+        score_surf = self.font.render(f'score: {self.score}', False, 'yellow')
         score_rect = score_surf.get_rect(topleft=(10, -10))
         screen.blit(score_surf, score_rect)
 
@@ -186,13 +195,34 @@ class Game:
             clock.tick(60)
 
 
+class CRT:
+    def __init__(self):
+        self.tv = pygame.image.load("graphics/tv.png").convert_alpha()
+        self.tv = pygame.transform.scale(self.tv, (screen_width, screen_height))
+
+    def draw(self):
+        self.tv.set_alpha(randint(75, 90))
+        screen.blit(self.tv, (0, 0))
+
+    def create_crt_lines(self):
+        line_height = 3
+        line_amount = int(screen_height / line_height)
+        for line in range(line_amount):
+            y_pos = line * line_height
+            pygame.draw.line(self.tv, 'black', (0, y_pos), (screen_width, y_pos), 1)
+
+
+
 if __name__ == "__main__":
     pygame.init()
-    screen_width = 600
-    screen_height = 600
+    screen_width = 1280
+    screen_height = 720
     screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
 
     game = Game()
+    crt = CRT()
     game.run()
+    crt.draw()
+
 
